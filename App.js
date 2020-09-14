@@ -1,8 +1,10 @@
 
 
 import React, {useState} from 'react';
-import { Text , StyleSheet , View , FlatList, SegmentedControlIOSBase} from 'react-native';
+import { Text , StyleSheet , View , FlatList} from 'react-native';
 import Cita from './componentes/cita';
+import Formulario from './componentes/formulario';
+
 
 const App = () => {
 
@@ -25,10 +27,12 @@ const App = () => {
     <View style={styles.contenedor}>
       <Text style={styles.titulo}> {citas.length >0 ? 'Administrador de Citas' : 'No hay citas, agrega una'}</Text>
 
+      <Formulario/>
 
       <Text style={styles.titulo}>Administra tus citas</Text>
 
-       <FlatList
+
+       <FlatList 
         data={citas}
         renderItem = { ({item}) => <Cita cita={item} eliminarPaciente={eliminarPaciente} />}
         keyExtractor = { cita => cita.id}
