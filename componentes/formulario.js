@@ -1,9 +1,23 @@
 import React, {useState} from 'react';
-import {Text, StyleSheet, View, TextInput, Button} from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  View,
+  TextInput,
+  Button,
+  TouchableHighlight,
+  Alert,
+  ScrollView
+} from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const formulario = () => {
+  const [paciente, guardarPaciente] = useState('');
+  const [propietario, guardarPropietario] = useState('');
+  const [telefono, guardarTelefono] = useState('');
   const [fecha, guardarFecha] = useState('');
+  const [sintamos, guardarSintomas] = useState('');
+
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const showDatePicker = () => {
@@ -15,19 +29,47 @@ const formulario = () => {
   };
 
   const confirmarFecha = (date) => {
-    const opciones = {year: 'numeric', month: 'long', day: '2-digit',hour:'2-digit',minute:'2-digit'};
+    const opciones = {
+      year: 'numeric',
+      month: 'long',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    };
     guardarFecha(date.toLocaleDateString('es-Es', opciones));
     hideDatePicker();
   };
 
+  const crearNuevaCita = () => {
+    //Validar
+    if(paciente.trim() === '' || propietario.trim() === '' || telefono.trim() === '' || fecha.trim() === '' || guardarSintomas.trim() === ''){
+      mostrarAlerta();
+
+      return;
+    }
+  }
+
+  //Muestra la alerta si falla la validacion
+
+  const mostrarAlerta = () => {
+    Alert.alert(
+      'Error',//titulo
+      'Todos los campos son obligatorios', //mensaje
+      [{
+        texto: 'OK' // Arreglo de botones
+      }]
+    )
+  }
+
+
   return (
     <>
-      <View style={styles.formulario}>
+      <ScrollView style={styles.formulario}>
         <View>
           <Text style={styles.label}>Paciente</Text>
           <TextInput
             style={styles.input}
-            onChangeText={(texto) => console.log(texto)}
+            onChangeText={(texto) => guardarPaciente(texto)}
           />
         </View>
 
@@ -35,7 +77,7 @@ const formulario = () => {
           <Text style={styles.label}>Dueño</Text>
           <TextInput
             style={styles.input}
-            onChangeText={(texto) => console.log(texto)}
+            onChangeText={(texto) => guardarPropietario(texto)}
           />
         </View>
 
@@ -43,7 +85,7 @@ const formulario = () => {
           <Text style={styles.label}>Telefono Contacto</Text>
           <TextInput
             style={styles.input}
-            onChangeText={(texto) => console.log(texto)}
+            onChangeText={(texto) => guardarTelefono(texto)}
             keyboardType={'numeric'}
           />
         </View>
@@ -65,11 +107,19 @@ const formulario = () => {
           <Text style={styles.label}>Sintomas</Text>
           <TextInput
             style={styles.input}
-            onChangeText={(texto) => console.log(texto)}
+            onChangeText={(texto) => guardarSintomas(texto)}
             multiline
           />
         </View>
-      </View>
+
+        <View>
+          <TouchableHighlight
+            onPress={() => crearNuevaCita()}
+            style={styles.btnSubmit}>
+            <Text style={styles.textoSubmit}>Crear nueva cita &times; </Text>
+          </TouchableHighlight>
+        </View>
+      </ScrollView>
     </>
   );
 };
@@ -79,7 +129,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    marginHorizontal: '2.5%',
+   
   },
   label: {
     fontWeight: 'bold',
@@ -92,6 +142,16 @@ const styles = StyleSheet.create({
     borderColor: '#e1e1e1',
     borderWidth: 1,
     borderStyle: 'solid',
+  },
+  btnSubmit: {
+    padding: 10,
+    backgroundColor: '#AA076e',
+    marginVertical: 10,
+  },
+  textoSubmit: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

@@ -1,9 +1,18 @@
 import React, {useState} from 'react';
-import {Text, StyleSheet, View, FlatList} from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  View,
+  FlatList,
+  TouchableHighlight, 
+  Platform
+} from 'react-native';
 import Cita from './componentes/cita';
 import Formulario from './componentes/formulario';
 
 const App = () => {
+  const [mostrarForm, guardarMostrarForm] = useState(false);
+
   const [citas, setCitas] = useState([
     {id: '1', paciente: 'Hook', propietario: 'Juan', sintomas: 'No Come'},
     {id: '2', paciente: 'Redux', propietario: 'Itzel', sintomas: 'No Duerme'},
@@ -18,6 +27,12 @@ const App = () => {
     });
   };
 
+  //muestra u oculta el formulario
+
+  const mostrarFormulario = () => {
+    guardarMostrarForm(!mostrarForm);
+  };
+
   return (
     <View style={styles.contenedor}>
       <Text style={styles.titulo}>
@@ -27,17 +42,34 @@ const App = () => {
           : 'No hay citas, agrega una'}
       </Text>
 
-      <Formulario />
+      <View>
+        <TouchableHighlight
+          onPress={() => mostrarFormulario()}
+          style={styles.btnMostrarForm}>
+          <Text style={styles.textoMostrarForm}>Crear nueva cita &times; </Text>
+        </TouchableHighlight>
+      </View>
 
-      <Text style={styles.titulo}>Administra tus citas</Text>
-
-      <FlatList
-        data={citas}
-        renderItem={({item}) => (
-          <Cita cita={item} eliminarPaciente={eliminarPaciente} />
+      <View style={styles.contenedor}>
+        {mostrarForm ? (
+          <>
+          <Text style={styles.titulo}>Crear nueva cita</Text>
+          <Formulario />
+          </>
+        ) : (
+          <>
+            <Text style={styles.titulo}>Administra tus citas</Text>
+            <FlatList
+              style={styles.listado}
+              data={citas}
+              renderItem={({item}) => (
+                <Cita cita={item} eliminarPaciente={eliminarPaciente} />
+              )}
+              keyExtractor={(cita) => cita.id}
+            />
+          </>
         )}
-        keyExtractor={(cita) => cita.id}
-      />
+      </View>
     </View>
   );
 };
@@ -50,10 +82,27 @@ const styles = StyleSheet.create({
   titulo: {
     color: '#FFF',
     textAlign: 'center',
-    marginTop: 40,
+    marginTop: Platform.OS === 'ios' ? 40 : 20,
     marginBottom: 20,
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  contenida: {
+    flex: 1,
+    marginHorizontal: '2.5%',
+  },
+  listado: {
+    flex: 1,
+  },
+  btnMostrarForm: {
+    padding: 10,
+    backgroundColor: '#AA078a',
+    marginVertical: 10,
+  },
+  textoMostrarForm: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
