@@ -8,7 +8,7 @@ npx react-native init nombreApp
 
 ```
 
-npx run android para ejecutar la app en el telefeno
+npx run android para ejecutar la app en el telefono
 ```
 
 Recuerden ejecutar ```npm install``` para las librerias
