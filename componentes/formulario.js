@@ -10,13 +10,14 @@ import {
   ScrollView
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import shortid from 'shortid';
 
-const formulario = () => {
+const formulario = ({citas, setCitas, guardarMostrarForm}) => {
   const [paciente, guardarPaciente] = useState('');
   const [propietario, guardarPropietario] = useState('');
   const [telefono, guardarTelefono] = useState('');
   const [fecha, guardarFecha] = useState('');
-  const [sintamos, guardarSintomas] = useState('');
+  const [sintomas, guardarSintomas] = useState('');
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -39,15 +40,33 @@ const formulario = () => {
     guardarFecha(date.toLocaleDateString('es-Es', opciones));
     hideDatePicker();
   };
-
+  
   const crearNuevaCita = () => {
     //Validar
-    if(paciente.trim() === '' || propietario.trim() === '' || telefono.trim() === '' || fecha.trim() === '' || guardarSintomas.trim() === ''){
+    if(paciente.trim() === '' || propietario.trim() === '' || telefono.trim() === '' || fecha.trim() === '' || sintomas.trim() === ''){
       mostrarAlerta();
 
       return;
     }
+    const cita = {paciente, propietario, telefono, fecha, sintomas};
+
+      // Crear una nueva cita
+    cita.id = shortid.generate();
+    console.log(cita);
+
+    //Agregar al state
+
+    const citasNuevo = [...citas,cita];
+    setCitas(citasNuevo);
+
+    //OCultar el formulario
+    guardarMostrarForm(false);
+
+    //Resetear el formulario
   }
+
+
+ 
 
   //Muestra la alerta si falla la validacion
 
