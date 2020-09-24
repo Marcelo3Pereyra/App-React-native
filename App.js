@@ -1,113 +1,121 @@
 import React, {useState} from 'react';
 import {
-  Text,
   StyleSheet,
+  Text,
   View,
   FlatList,
-  TouchableHighlight, 
-  Platform
+  TouchableHighlight,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Platform,
+  Image,
+  ScrollView,
 } from 'react-native';
 import Cita from './componentes/cita';
 import Formulario from './componentes/formulario';
 
 const App = () => {
-  const [mostrarForm, guardarMostrarForm] = useState(false);
+  const [mostrarForm, setMostrarForm] = useState(false);
 
-  const [citas, setCitas] = useState([
-    {id: '1', paciente: 'Hook', propietario: 'Juan', sintomas: 'No Come'},
-    {id: '2', paciente: 'Redux', propietario: 'Itzel', sintomas: 'No Duerme'},
-    {id: '3', paciente: 'Native', propietario: 'Josue', sintomas: 'No Canta'},
-  ]);
+  const [citas, setCitas] = useState([]);
 
-  //Elimina citas
-
-  const eliminarPaciente = (id) => {
+  //Elimina los pacientes del state
+  const eliminarCliente = (id) => {
     setCitas((citasActuales) => {
       return citasActuales.filter((cita) => cita.id !== id);
     });
   };
-
-  //muestra u oculta el formulario
-
-  const mostrarFormulario = () => {
-    guardarMostrarForm(!mostrarForm);
+  //Ocultar teclado
+  const cerrarTeclado = () => {
+    Keyboard.dismiss();
   };
 
   return (
-    <View style={styles.contenedor}>
-      <Text style={styles.titulo}>
-        {' '}
-        {citas.length > 0
-          ? 'Administrador de Citas'
-          : 'No hay citas, agrega una'}
-      </Text>
-
-      <View>
-        <TouchableHighlight
-          onPress={() => mostrarFormulario()}
-          style={styles.btnMostrarForm}>
-          <Text style={styles.textoMostrarForm}>Crear nueva cita &times; </Text>
-        </TouchableHighlight>
-      </View>
-
+    <TouchableWithoutFeedback
+      onPress={() => {
+        cerrarTeclado();
+      }}>
       <View style={styles.contenedor}>
-        {mostrarForm ? (
-          <>
-          <Text style={styles.titulo}>Crear nueva cita</Text>
-          <Formulario 
-            citas={citas}
-            setCitas={setCitas}
-            guardarMostrarForm={guardarMostrarForm}
+        {mostrarForm ? null : (
+          <Image
+            style={styles.img}
+            source={require('./assets/image/jireh.jpeg')}
           />
-          </>
-        ) : (
-          <>
-            <Text style={styles.titulo}>Administra tus citas</Text>
-            <FlatList
-              style={styles.listado}
-              data={citas}
-              renderItem={({item}) => (
-                <Cita cita={item} eliminarPaciente={eliminarPaciente} />
-              )}
-              keyExtractor={(cita) => cita.id}
-            />
-          </>
         )}
+        <View>
+          <TouchableHighlight
+            onPress={() => setMostrarForm(!mostrarForm)}
+            style={styles.btnMostrarForm}>
+            <Text style={styles.textoMostrarForm}>
+              {mostrarForm ? 'Cancelar Nuevo Turno' : 'Crear Nuevo Turno'}
+            </Text>
+          </TouchableHighlight>
+        </View>
+
+        <View style={styles.contenido}>
+          {mostrarForm ? (
+            <ScrollView>
+              <Formulario
+                citas={citas}
+                setCitas={setCitas}
+                setMostrarForm={setMostrarForm}
+              />
+            </ScrollView>
+          ) : (
+            <>
+              <Text style={styles.titulo}></Text>
+              <FlatList
+                style={styles.listado}
+                data={citas}
+                renderItem={({item}) => (
+                  <Cita item={item} eliminarCliente={eliminarCliente} />
+                )}
+                keyExtractor={(cita) => cita.id}
+              />
+            </>
+          )}
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
-  contenedor: {
-    backgroundColor: '#AA076B',
-    flex: 1,
-  },
-  titulo: {
-    color: '#FFF',
-    textAlign: 'center',
-    marginTop: Platform.OS === 'ios' ? 40 : 20,
-    marginBottom: 20,
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  contenida: {
+  contenido: {
     flex: 1,
     marginHorizontal: '2.5%',
   },
   listado: {
     flex: 1,
   },
+  contenedor: {
+    backgroundColor: '#00C1CA',
+    flex: 1,
+  },
+  titulo: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    marginTop: Platform.OS === 'android' ? 20 : 40,
+    textAlign: 'center',
+  },
   btnMostrarForm: {
     padding: 10,
-    backgroundColor: '#AA078a',
-    marginVertical: 10,
+    backgroundColor: '#0BA09C',
+    marginTop: 10,
   },
   textoMostrarForm: {
     color: '#FFF',
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  img: {
+    width: '100%',
+    height: 220,
+    marginVertical: 5,
+  },
 });
 
 export default App;
+

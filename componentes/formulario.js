@@ -1,102 +1,117 @@
 import React, {useState} from 'react';
 import {
-  Text,
   StyleSheet,
+  Text,
   View,
-  TextInput,
   Button,
+  TextInput,
   TouchableHighlight,
   Alert,
-  ScrollView
+  ScrollView,
 } from 'react-native';
+import moment from 'moment';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import shortid from 'shortid';
+import DropDownPicker from 'react-native-dropdown-picker';
 
-const formulario = ({citas, setCitas, guardarMostrarForm}) => {
-  const [paciente, guardarPaciente] = useState('');
-  const [propietario, guardarPropietario] = useState('');
-  const [telefono, guardarTelefono] = useState('');
-  const [fecha, guardarFecha] = useState('');
-  const [sintomas, guardarSintomas] = useState('');
-
+const Formulario = ({citas, setCitas, setMostrarForm}) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
+  const [cliente, setCliente] = useState('');
+  const [telefono, setTelefono] = useState('');
+  const [tratamiento, setTratamiento] = useState('Depilación');
+  const [fecha, setFecha] = useState(''); //Usado para guardar la fecha y hora
+  // Control del CheckBox
+
+  //Mostrar u ocultar DatePicker
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
-
   const hideDatePicker = () => {
     setDatePickerVisibility(false);
   };
-
-  const confirmarFecha = (date) => {
-    const opciones = {
-      year: 'numeric',
-      month: 'long',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    };
-    guardarFecha(date.toLocaleDateString('es-Es', opciones));
+  // Confirmar la fecha
+  const handleConfirmDate = (date) => {
+    setFecha(
+      moment(date).format('DD-MM-YYYY') + '\n' + moment(date).format('hh:mm A'),
+    );
     hideDatePicker();
   };
-  
+  //Crear nueva Cita
   const crearNuevaCita = () => {
-    //Validar
-    if(paciente.trim() === '' || propietario.trim() === '' || telefono.trim() === '' || fecha.trim() === '' || sintomas.trim() === ''){
+    //Validar que los campos no esten vacios
+    if (
+      cliente.trim() === '' ||
+      telefono.trim() === '' ||
+      fecha.trim() === ''
+    ) {
+      // Algo esta vacio
       mostrarAlerta();
-
       return;
     }
-    const cita = {paciente, propietario, telefono, fecha, sintomas};
+    //Si no estan vacios, crear nueva cita
+    const cita = {cliente, telefono, tratamiento, fecha};
 
-      // Crear una nueva cita
     cita.id = shortid.generate();
-    console.log(cita);
-
     //Agregar al state
+    const citaNueva = [...citas, cita];
+    setCitas(citaNueva);
 
-    const citasNuevo = [...citas,cita];
-    setCitas(citasNuevo);
-
-    //OCultar el formulario
-    guardarMostrarForm(false);
-
-    //Resetear el formulario
-  }
-
-
- 
-
-  //Muestra la alerta si falla la validacion
-
+    //Ocultar el formulario
+    setMostrarForm(false);
+  };
+  //Muestra la alerta si falla la validacion de campos
   const mostrarAlerta = () => {
     Alert.alert(
-      'Error',//titulo
-      'Todos los campos son obligatorios', //mensaje
-      [{
-        texto: 'OK' // Arreglo de botones
-      }]
-    )
-  }
+      'Error', //Titulo
+      'Todos los campos son obligatorios', //Mensaje
+      [
+        {
+          text: 'OK', //Arreglo de botones
+        },
+      ],
+    );
+  };
 
+  const item = [
+    {
+      label: 'Depilación',
+      value: 'Depilación',
+    },
+    {
+      label: 'Esmaltado',
+      value: 'Esmaltado',
+    },
+    {
+      label: 'Velaslim',
+      value: 'Velaslim',
+    },
+    {
+      label: 'Body Up',
+      value: 'Body Up',
+    },
+    {
+      label: 'Limpieza Facial',
+      value: 'Limpieza Facial',
+    },
+    {
+      label: 'Perfilado Cejas',
+      value: 'Perfilado Cejas',
+    },
+    {
+      label: 'Perfilado Pestañas',
+      value: 'Perfilado Pestañas',
+    },
+  ];
 
   return (
     <>
       <ScrollView style={styles.formulario}>
         <View>
-          <Text style={styles.label}>Paciente</Text>
+          <Text style={styles.label}>Nombre y Apellido</Text>
           <TextInput
             style={styles.input}
-            onChangeText={(texto) => guardarPaciente(texto)}
-          />
-        </View>
-
-        <View>
-          <Text style={styles.label}>Dueño</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={(texto) => guardarPropietario(texto)}
+            onChangeText={(texto) => setCliente(texto)}
           />
         </View>
 
@@ -104,38 +119,46 @@ const formulario = ({citas, setCitas, guardarMostrarForm}) => {
           <Text style={styles.label}>Telefono Contacto</Text>
           <TextInput
             style={styles.input}
-            onChangeText={(texto) => guardarTelefono(texto)}
+            onChangeText={(texto) => setTelefono(texto)}
             keyboardType={'numeric'}
           />
         </View>
 
-        <View>
-          <Text style={styles.label}>Fecha:</Text>
-          <Button title="Seleccionar Fecha" onPress={showDatePicker} />
+        <View style={{
+            ...(Platform.OS !== 'android' && {
+              zIndex: 10,
+            }),
+          }}>
+          <Text style={styles.label}>Tratamientos</Text>
+          <DropDownPicker
+            items={item}
+            defaultValue={'Depilación'}
+            containerStyle={{height: 40}}
+            itemStyle={{
+              justifyContent: 'flex-start',
+            }}
+            onChangeItem={({value}) => setTratamiento(value)}
+          />
+        </View>
+
+        <View style={{zIndex: 10}}>
+          <Text style={styles.label}>Fecha y Hora:</Text>
+          <Button title="Seleccionar Fecha y Hora" onPress={showDatePicker} />
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
-            mode="datetime"
-            onConfirm={confirmarFecha}
+            mode="datetime" // datetime es un modo donde elegis la fecha, y luego la hora, todo junto
+            onConfirm={handleConfirmDate}
             onCancel={hideDatePicker}
             locale="es_ES"
           />
           <Text>{fecha}</Text>
         </View>
 
-        <View>
-          <Text style={styles.label}>Sintomas</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={(texto) => guardarSintomas(texto)}
-            multiline
-          />
-        </View>
-
-        <View>
+        <View style={styles.textoSubmit}>
           <TouchableHighlight
             onPress={() => crearNuevaCita()}
             style={styles.btnSubmit}>
-            <Text style={styles.textoSubmit}>Crear nueva cita &times; </Text>
+            <Text style={styles.textoSubmit}>Guardar Turno</Text>
           </TouchableHighlight>
         </View>
       </ScrollView>
@@ -145,15 +168,15 @@ const formulario = ({citas, setCitas, guardarMostrarForm}) => {
 
 const styles = StyleSheet.create({
   formulario: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingVertical: 10,
-   
+    marginBottom: 20,
   },
   label: {
     fontWeight: 'bold',
     fontSize: 18,
-    marginTop: 20,
+    marginTop: 10,
   },
   input: {
     marginTop: 10,
@@ -164,14 +187,14 @@ const styles = StyleSheet.create({
   },
   btnSubmit: {
     padding: 10,
-    backgroundColor: '#AA076e',
-    marginVertical: 10,
+    backgroundColor: '#2D90DA',
+    marginTop: 10
   },
   textoSubmit: {
     color: '#FFF',
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'center'
   },
 });
 
-export default formulario;
+export default Formulario;
