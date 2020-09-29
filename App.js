@@ -1,21 +1,23 @@
 import React, {useState} from 'react';
 import {
   StyleSheet,
-  Text,
   View,
   FlatList,
   TouchableHighlight,
   TouchableWithoutFeedback,
-  Keyboard,
   Platform,
   Image,
   ScrollView,
+  Keyboard,
+  Text,
 } from 'react-native';
 import Cita from './componentes/cita';
 import Formulario from './componentes/formulario';
 
 const App = () => {
-  const [mostrarForm, setMostrarForm] = useState(false);
+  const [mostrarForm, setMostrarForm] = useState(false); //Mostrar el formulario para turno. Empieza en falso
+  const [mostrarTurnos, setMostrarTurnos] = useState(false); //Muestra los turnos dado. Empieza en false
+  const [styleBtn, setStyleBtn] = useState(true);
 
   const [citas, setCitas] = useState([]);
 
@@ -30,42 +32,63 @@ const App = () => {
     Keyboard.dismiss();
   };
 
+  const colorBtn = styleBtn ? styles.btnMostrarForm : styles.btnCancelarForm
+
   return (
     <TouchableWithoutFeedback
       onPress={() => {
         cerrarTeclado();
       }}>
       <View style={styles.contenedor}>
-        {mostrarForm ? null : (
+        {mostrarForm || mostrarTurnos ? null : (
+          //Si el formulario o turnos estan cerrados, muestra la imagen, sino , la esconde
           <Image
             style={styles.img}
             source={require('./assets/image/jireh.jpeg')}
           />
         )}
-        <View>
-          <TouchableHighlight
-            onPress={() => setMostrarForm(!mostrarForm)}
-            style={styles.btnMostrarForm}>
-            <Text style={styles.textoMostrarForm}>
-              {mostrarForm ? 'Cancelar Nuevo Turno' : 'Crear Nuevo Turno'}
-            </Text>
-          </TouchableHighlight>
-        </View>
 
+        {/* Boton para mostrar formulario*/}
+        {mostrarTurnos ? null : (
+          <View>
+            <TouchableHighlight
+              onPress={() => (setMostrarForm(!mostrarForm),setStyleBtn(!styleBtn))}
+              style={colorBtn}>
+              <Text style={styles.textoMostrarForm}>
+                {mostrarForm ? 'Cancelar nuevo turno' : 'Crear nuevo turno'}
+              </Text>
+            </TouchableHighlight>
+          </View>
+        )}
+
+        {/*Boton para mostrar turnos */}
+        {mostrarForm ? null : (
+          <View>
+            <TouchableHighlight
+              onPress={() =>  (setMostrarTurnos(!mostrarTurnos),setStyleBtn(!styleBtn))}
+              style={colorBtn}>
+              <Text style={styles.textoMostrarForm}>
+                {mostrarTurnos ? 'Cerrar turnos' : 'Mostrar Turnos'}
+              </Text>
+            </TouchableHighlight>
+          </View>
+        )}
+
+        {/*Vistas del formulario */}
         <View style={styles.contenido}>
           {mostrarForm ? (
-            <ScrollView>
+            <ScrollView syle={styles.margenes}>
               <Formulario
                 citas={citas}
                 setCitas={setCitas}
                 setMostrarForm={setMostrarForm}
+                setStyleBtn={setStyleBtn}
               />
             </ScrollView>
-          ) : (
+          ) : mostrarTurnos ? (
             <>
-              <Text style={styles.titulo}></Text>
               <FlatList
-                style={styles.listado}
+                style={(styles.listado, styles.margenes)}
                 data={citas}
                 renderItem={({item}) => (
                   <Cita item={item} eliminarCliente={eliminarCliente} />
@@ -73,7 +96,7 @@ const App = () => {
                 keyExtractor={(cita) => cita.id}
               />
             </>
-          )}
+          ) : null}
         </View>
       </View>
     </TouchableWithoutFeedback>
@@ -92,17 +115,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#00C1CA',
     flex: 1,
   },
-  titulo: {
-    color: 'white',
-    fontSize: 24,
-    fontWeight: 'bold',
+  margenes: {
     marginBottom: 20,
     marginTop: Platform.OS === 'android' ? 20 : 40,
-    textAlign: 'center',
   },
   btnMostrarForm: {
     padding: 10,
     backgroundColor: '#0BA09C',
+    marginTop: 10,
+  },
+  btnCancelarForm:{
+    padding: 10,
+    backgroundColor: 'red',
     marginTop: 10,
   },
   textoMostrarForm: {
@@ -118,4 +142,3 @@ const styles = StyleSheet.create({
 });
 
 export default App;
-

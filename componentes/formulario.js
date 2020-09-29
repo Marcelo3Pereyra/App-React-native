@@ -14,9 +14,9 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import shortid from 'shortid';
 import DropDownPicker from 'react-native-dropdown-picker';
 
-const Formulario = ({citas, setCitas, setMostrarForm}) => {
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
+const Formulario = ({citas, setCitas, setMostrarForm,setStyleBtn}) => {
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [cliente, setCliente] = useState('');
   const [telefono, setTelefono] = useState('');
   const [tratamiento, setTratamiento] = useState('Depilación');
@@ -56,6 +56,8 @@ const Formulario = ({citas, setCitas, setMostrarForm}) => {
     //Agregar al state
     const citaNueva = [...citas, cita];
     setCitas(citaNueva);
+
+    setStyleBtn(true);
 
     //Ocultar el formulario
     setMostrarForm(false);
@@ -107,6 +109,8 @@ const Formulario = ({citas, setCitas, setMostrarForm}) => {
   return (
     <>
       <ScrollView style={styles.formulario}>
+        
+        {/*Nombre y Apellido*/}
         <View>
           <Text style={styles.label}>Nombre y Apellido</Text>
           <TextInput
@@ -115,6 +119,7 @@ const Formulario = ({citas, setCitas, setMostrarForm}) => {
           />
         </View>
 
+        {/*Telefono Contacto*/}
         <View>
           <Text style={styles.label}>Telefono Contacto</Text>
           <TextInput
@@ -124,7 +129,9 @@ const Formulario = ({citas, setCitas, setMostrarForm}) => {
           />
         </View>
 
-        <View style={{
+        {/*DropDownPicker*/}
+        <View
+          style={{
             ...(Platform.OS !== 'android' && {
               zIndex: 10,
             }),
@@ -134,13 +141,17 @@ const Formulario = ({citas, setCitas, setMostrarForm}) => {
             items={item}
             defaultValue={'Depilación'}
             containerStyle={{height: 40}}
+            style={{backgroundColor: '#fafafa'}}
             itemStyle={{
               justifyContent: 'flex-start',
             }}
+            dropDownStyle={{backgroundColor: '#fafafa'}}
             onChangeItem={({value}) => setTratamiento(value)}
+            showArrow={false}
           />
         </View>
 
+        {/*Fecha y Hora*/}
         <View style={{zIndex: 10}}>
           <Text style={styles.label}>Fecha y Hora:</Text>
           <Button title="Seleccionar Fecha y Hora" onPress={showDatePicker} />
@@ -154,6 +165,7 @@ const Formulario = ({citas, setCitas, setMostrarForm}) => {
           <Text>{fecha}</Text>
         </View>
 
+        {/*Boton para guardar*/}
         <View style={styles.textoSubmit}>
           <TouchableHighlight
             onPress={() => crearNuevaCita()}
@@ -188,12 +200,12 @@ const styles = StyleSheet.create({
   btnSubmit: {
     padding: 10,
     backgroundColor: '#2D90DA',
-    marginTop: 10
+    marginTop: 10,
   },
   textoSubmit: {
     color: '#FFF',
     fontWeight: 'bold',
-    textAlign: 'center'
+    textAlign: 'center',
   },
 });
 
